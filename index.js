@@ -1,27 +1,28 @@
 const express = require('express');
+const session = require('express-session');
+const { Issuer, generators } = require('openid-client');
 const app = express();
 const dotenv = require('dotenv');
 dotenv.config()
       
 
 
-app.get('/', (req, res) => {
+app.get('/hello', (req, res) => {
     res.send("hello world")
 })
 
-//TODO: implement the auth system with cognito
 
-/*
+
 let client;
 
 
 // Initialize OpenID Client
 async function initializeClient() {
-    const issuer = await Issuer.discover('https://cognito-idp.eu-west-3.amazonaws.com/eu-west-3_IT4dHreQq');
+    const issuer = await Issuer.discover(`https://cognito-idp.${process.env.COGNITO_REGION_AWS}.amazonaws.com/${process.env.COGNITO_REGION_AWS}_IT4dHreQq`);
     client = new issuer.Client({
         client_id: process.env.COGNITO_SECRET_CLIENT_ID,
         client_secret: process.env.COGNITO_SECRET_CLIENT,
-        redirect_uris: ['https://d84l1y8p4kdic.cloudfront.net'],
+        redirect_uris: [`${process.env.REDIRECT_URI}`],
         response_types: ['code']
     });
 };
@@ -74,11 +75,11 @@ function getPathFromURL(urlString) {
     }
 }
 
-app.get(getPathFromURL('https://d84l1y8p4kdic.cloudfront.net'), async (req, res) => {
+app.get(getPathFromURL(`${process.env.REDIRECT_URI}`), async (req, res) => {
     try {
         const params = client.callbackParams(req);
         const tokenSet = await client.callback(
-            'https://d84l1y8p4kdic.cloudfront.net',
+            `${process.env.REDIRECT_URI}`,
             params,
             {
                 nonce: req.session.nonce,
@@ -99,13 +100,13 @@ app.get(getPathFromURL('https://d84l1y8p4kdic.cloudfront.net'), async (req, res)
 // Logout route
 app.get('/logout', (req, res) => {
     req.session.destroy();
-    const logoutUrl = `https://eu-west-3it4dhreqq.auth.eu-west-3.amazoncognito.com/logout?client_id=3eu7lnhdgfnu78ak429dlf898l&logout_uri=<logout uri>`;
+    const logoutUrl = `https://eu-west-3it4dhreqq.auth.eu-west-3.amazoncognito.com/logout?client_id=3eu7lnhdgfnu78ak429dlf898l&logout_uri=/login`;
     res.redirect(logoutUrl);
 });
 
 
 
-app.set('view engine', 'ejs');*/
+app.set('view engine', 'ejs');
 
 const port = 3000;
 
